@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador e Validador de Key MD5</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gerador e Validador de Key MD5</h1>
+
+    <!-- Gerar Key -->
+    <form id="generateForm">
+        <h2>Gerar Key</h2>
+        <label for="generateDate">Data de validade:</label>
+        <input type="date" id="generateDate" required>
+        <button type="submit">Gerar Key</button>
+    </form>
+    <p>Key gerada: <span id="generatedKey"></span></p>
+
+    <hr>
+
+    <!-- Validar Key -->
+    <form id="validateForm">
+        <h2>Validar Key</h2>
+        <label for="validateDate">Data de validade:</label>
+        <input type="date" id="validateDate" required>
+        <label for="validateKey">Key:</label>
+        <input type="text" id="validateKey" required>
+        <button type="submit">Validar Key</button>
+    </form>
+    <p class="result" id="validationResult"></p>
+
+    <script>
+        const SALT = "CHAVE_SECRETA"; // Mantenha esta string consistente e segura.
+
+        // Gerar Key
+        document.getElementById("generateForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const date = document.getElementById("generateDate").value;
+
+            if (!date) {
+                alert("Por favor, insira uma data!");
+                return;
+            }
+
+            // Concatenar data com o salt e gerar o hash MD5
+            const dataConcat = date + SALT;
+            const hash = CryptoJS.MD5(dataConcat).toString();
+
+            // Mostrar a key gerada
+            document.getElementById("generatedKey").innerText = hash;
+        });
+
+        // Validar Key
+        document.getElementById("validateForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const date = document.getElementById("validateDate").value;
+            const key = document.getElementById("validateKey").value;
+
+            if (!date || !key) {
+                alert("Por favor, insira a data e a key!");
+                return;
+            }
+
+            // Concatenar data com o salt e gerar o hash MD5
+            const dataConcat = date + SALT;
+            const expectedHash = CryptoJS.MD5(dataConcat).toString();
+
+            // Validar a key
+            const currentDate = new Date();
+            const inputDate = new Date(date);
+
+            if (expectedHash === key) {
+                if (inputDate >= currentDate) {
+                    document.getElementById("validationResult").innerText = "Key válida!";
+                    document.getElementById("validationResult").style.color = "green";
+                } else {
+                    document.getElementById("validationResult").innerText = "Key expirada!";
+                    document.getElementById("validationResult").style.color = "orange";
+                }
+            } else {
+                document.getElementById("validationResult").innerText = "Key inválida!";
+                document.getElementById("validationResult").style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>
